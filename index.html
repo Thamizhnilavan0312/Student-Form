@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <img src="image/studentLogo.png" alt="studentLogo" class="icon">
+        <h2>Student Details Form</h2>
+        <form id="studentForm">
+            <label>Student Name:</label>
+            <input type="text" id="name" required>
+
+            <label>Date of Birth:</label>
+            <input type="date" id="dob" required>
+
+            <label>Gender:</label>
+            <select id="gender" required>
+                <option value="">Select Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+            </select>
+
+            <label>Choose Course:</label>
+            <div class="course-checkbox">
+                <label><input type="checkbox" value="Python" class="course">Python</label>
+                <label><input type="checkbox" value="Java" class="course">Java</label>
+                <label><input type="checkbox" value="C++" class="course">C++</label>
+            </div>
+
+            <label>Email:</label>
+            <input type="email" id="email" required>
+
+            <button class="btn" type="submit">Save</button>
+        </form>
+
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>DOB</th>
+                    <th>Gender</th>
+                    <th>Course</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+        </table>
+
+    </div>
+
+    <script>
+        const studentForm = document.getElementById("studentForm");
+        const studentTable = document.getElementById("studentTableBody");
+
+        let students = [];
+        let editIndex = null;
+        studentForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const dob = document.getElementById("dob").value;
+            const gender = document.getElementById("gender").value;
+            const email = document.getElementById("email").value;
+            const courses = [...document.querySelectorAll(".course:checked")].map(c => c.value).join(", ");
+
+            const student = { name, dob, gender, courses, email };
+
+            if (editIndex !== null) {
+                students[editIndex] = student;
+                editIndex = null;
+            } else {
+                students.push(student);
+            }
+
+            studentForm.reset();
+            displayStudents();
+        });
+
+        function displayStudents() {
+            studentTable.innerHTML = "";
+            students.forEach((student, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+          <td>${student.name}</td>
+          <td>${student.dob}</td>
+          <td>${student.gender}</td>
+          <td>${student.courses}</td>
+          <td>${student.email}</td>
+          <td class="actions">
+            <button class="edit-btn" onclick="editStudent(${index})">Edit</button>
+            <button class="delete-btn" onclick="deleteStudent(${index})">Delete</button>
+          </td>
+        `;
+                studentTable.appendChild(row);
+            });
+        }
+
+        function deleteStudent(index) {
+            students.splice(index, 1);
+            displayStudents();
+        }
+
+        function editStudent(index) {
+            const student = students[index];
+            document.getElementById("name").value = student.name;
+            document.getElementById("dob").value = student.dob;
+            document.getElementById("gender").value = student.gender;
+            document.getElementById("email").value = student.email;
+
+            document.querySelectorAll(".course").forEach(checkbox => {
+                checkbox.checked = student.courses.includes(checkbox.value);
+            });
+
+            editIndex = index;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+    </script>
+
+</body>
+
+</html>
